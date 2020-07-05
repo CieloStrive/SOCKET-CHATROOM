@@ -1,8 +1,26 @@
 # SOCKET-CHATROOM
 
+- [SOCKET-CHATROOM](#socket-chatroom)
+  - [build server](#build-server)
+    - [1. start with the imports and some starting values](#1-start-with-the-imports-and-some-starting-values)
+    - [2. Initially setup our socket](#2-initially-setup-our-socket)
+    - [3. setting for socket option](#3-setting-for-socket-option)
+    - [4. bind and listen](#4-bind-and-listen)
+    - [5. create two monitoring lists](#5-create-two-monitoring-lists)
+    - [6. define an function for receive message](#6-define-an-function-for-receive-message)
+    - [7. function of server](#7-function-of-server)
+  - [build client](#build-client)
+    - [1.  import library and do some initialization](#1-import-library-and-do-some-initialization)
+    - [2. for the first connection](#2-for-the-first-connection)
+    - [3. now define function for send message](#3-now-define-function-for-send-message)
+    - [4. define function for receive message](#4-define-function-for-receive-message)
+  - [Appendix](#appendix)
+    - [1. about setblocking() and socket modes](#1-about-setblocking-and-socket-modes)
+    - [2. about header in message](#2-about-header-in-message)
+
 ## build server 
 
-### 1. start with the imports and some starting values:
+### 1. start with the imports and some starting values
 
 ```py
 #!/usr/bin/env python3
@@ -21,7 +39,7 @@ IP = "127.0.0.1"
 PORT = 1234
 
 ```
-### 2. Initially setup our socket:
+### 2. Initially setup our socket
 
 ```py
 server_socket =  socket.socket(socket.AF_INET,socket.SOCK_STREAM)
@@ -42,14 +60,14 @@ server_socket.setsockopt(socket.SOL_SOCKET,socket.SO_REUSEADDR,1)
 # SOL-Socket Option Level, SO-Socket Option, 1 is true, allows us to reconnect
 ```
 
-### 4. bind and listen:
+### 4. bind and listen
 
 ```py
 server_socket.bind((IP,PORT))
 server_socket.listen()
 ```
 
-### 5. create two monitoring lists: 
+### 5. create two monitoring lists
 
 one for monitoring sockets, one for record clients in chatroom, the second is actually a dictionary for "socket: username".
 
@@ -78,7 +96,7 @@ def receive_message(client_socket):
         return False
 ```
 
-### 7. function of server: 
+### 7. function of server
 
 receive and identify user for the first connection and record them, receive message from them and transfer the message to the rest user. The server needs to accept new connections from clients. So our clients need to connect to server and for the first connection and transmission we design client to ask user to input a username and pass to server. Beyond all this, the server will collect incoming messages and then distribute them to the rest of the connected clients.
 
@@ -196,7 +214,7 @@ def send_message(client_socket):
             client_socket.send(message_header + message)
 ```
 
-### 4. define function for receive message: 
+### 4. define function for receive message 
 
 an while loop makes it monitoring socket for imcoming message. And then we have to make receive function consistent to server, disassemble message to user_header, username, message_header, message and correctly receive them.    Moreover, there will be exception like IO exception when there is no message incoming, we have to handle this situation and let function continue, and for other exception let system exit. 
 
@@ -250,7 +268,7 @@ send.start()
 
 ## Appendix
 
-### 1. about setblocking():
+### 1. about setblocking() and socket modes
 
 ```py 
 setblocking(False) 
@@ -269,7 +287,7 @@ In timeout mode, operations fail if they cannot be completed within the timeout 
 
 Note At the operating system level, sockets in timeout mode are internally set in non-blocking mode. Also, the blocking and timeout modes are shared between file descriptors and socket objects that refer to the same network endpoint. This implementation detail can have visible consequences if e.g. you decide to use the fileno() of a socket.
 
-### 2. about header in message:
+### 2. about header in message
 
 header is designed for let program know how long is the message 
 
